@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 
 const char TAB = '\t';
 char look;
@@ -43,7 +44,7 @@ char getName() {
         expected("name");
     }
 
-    char name = std::toupper(look);
+    char name = look;
     getChar();
 
     return name;
@@ -54,7 +55,7 @@ char getNumber() {
         expected("number");
     }
 
-    char num;
+    char num = look;
     getChar();
 
     return num;
@@ -69,10 +70,17 @@ void emitLn(const std::string& s) {
     std::cout << '\n';
 }
 
+void expression() {
+    std::ostringstream output;
+    output << "MOVE #" << getNumber() << ",D0";
+    emitLn(output.str());
+}
+
 void init() {
     getChar();
 }
 
 int main() {
     init();
+    expression();
 }
