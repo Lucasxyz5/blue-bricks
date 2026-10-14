@@ -1,2 +1,4 @@
 comp
-output.asm
+output.s
+code.txt
+output

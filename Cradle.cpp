@@ -61,19 +61,30 @@ char getNumber() {
     return num;
 }
 
-void emit(const std::string &s) {
-    std::cout << '\t' << s;
+void emit(const std::string &s, bool indent = true) {
+    if (indent) { std::cout << '\t'; }
+    std::cout  << s;
 }
 
-void emitLn(const std::string& s) {
-    emit(s);
+void emitLn(const std::string& s, bool indent = true) {
+    emit(s, indent);
     std::cout << '\n';
 }
 
 void expression() {
     std::ostringstream output;
-    output << "MOVE #" << getNumber() << ",D0";
+    output << "movl $" << getNumber() << ", %eax";
     emitLn(output.str());
+}
+
+void header() {
+    emitLn(".text", false);
+    emitLn(".globl _main", false);
+    emitLn("_main:", false);
+}
+
+void footer() {
+    emitLn("ret");
 }
 
 void init() {
@@ -82,5 +93,9 @@ void init() {
 
 int main() {
     init();
+    header();
+
     expression();
+
+    footer();
 }
