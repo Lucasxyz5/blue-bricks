@@ -11,10 +11,6 @@ class RegisterManager {
     std::vector<std::string> registers = { "%eax", "%ebx", "%ecx", "%edx", "%r8d", "%r9d"};
     std::vector<bool> regAvailable = std::vector<bool>(registers.size(), true);
     public:
-    RegisterManager() {
-
-    }
-
     std::string allocReg() {
         for (int i = 0; i < registers.size(); i++) {
             if (regAvailable[i] == true) {
