@@ -1,8 +1,44 @@
 #include <iostream>
 #include <sstream>
+#include <vector>
+#include <string>
 
 const char TAB = '\t';
 char look;
+
+class RegisterManager {
+    private:
+    std::vector<std::string> registers = { "%eax", "%ebx", "%ecx", "%edx", "%r8d", "%r9d"};
+    std::vector<bool> regAvailable = std::vector<bool>(registers.size(), true);
+    public:
+    RegisterManager() {
+
+    }
+
+    std::string allocReg() {
+        for (int i = 0; i < registers.size(); i++) {
+            if (regAvailable[i] == true) {
+                regAvailable[i] = false;
+                return registers[i];
+            }
+        }
+        return "error";
+    }
+
+    bool freeReg(std::string reg) {
+        for (int i = 0; i < registers.size(); i++) {
+            if (registers[i] == reg) {
+                if (regAvailable[i]) {
+                    return false;
+                }
+                regAvailable[i] = true;
+                return true;
+            }
+        }
+        return false;
+    }
+};
+
 
 void getChar() {
     std::cin.get(look);
@@ -92,6 +128,7 @@ void init() {
 }
 
 int main() {
+    RegisterManager regManager;
     init();
     header();
 

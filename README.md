@@ -5,7 +5,7 @@ You can see yur target by running: "clang --version".
 This code might run on other x86_64 apple systems. It will not run on any other system.
 
 compile with: 
-g++ Cradle.cpp -o comp
+g++ -std=c++11 Cradle.cpp -o Cradle
 run compiler with: 
 ./comp < code.txt > output.s
 assemble with: 

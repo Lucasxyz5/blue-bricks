@@ -1,4 +1,6 @@
 comp
 output.s
-code.txt
 output
+code.txt
+compile.sh
+cheatsheet.txt
