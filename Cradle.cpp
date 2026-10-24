@@ -2,86 +2,8 @@
 #include <sstream>
 #include <vector>
 #include <string>
-
-const char TAB = '\t';
-char look;
-
-std::vector<std::string> registers = {
-    "%eax", "%ecx", "%edx", "%esi", "%edi",
-    "%r8d", "%r9d", "%r10d", "%r11d"
-};
-
-std::vector<std::string> registers64 = {
-    "%rax", "%rcx", "%rdx", "%rsi", "%rdi",
-    "%r8", "%r9", "%r10", "%r11"
-};
-std::vector<bool> regAvailable = std::vector<bool>(registers.size(), true);
-
-int allocReg() {
-    for (int i = 0; i < registers.size(); i++) {
-        if (regAvailable[i] == true) {
-            regAvailable[i] = false;
-            return i;
-        }
-    }
-    return -1;
-}
-
-bool freeReg(int reg) {
-    if (regAvailable[reg]) {
-        return false;
-    }
-    regAvailable[reg] = true;
-    return true;
-}
-
-void getChar() {
-    if (!std::cin.get(look)) {
-        look = '\0';
-    }
-}
-
-void error(const std::string &s) {
-    std::cout << "\n" << "error " << s << ".\n";
-}
-
-void abortBlue(const std::string &s) {
-    error(s);
-    std::exit(1);
-}
-
-void expected(const std::string &s) {
-    abortBlue(s + " expected, got " + look);
-}
-
-void match(char x) {
-    if (look == x) {
-        getChar();
-    }
-    else {
-        expected(std::string(1, x));
-    }
-}
-
-bool isAlphaBlue(char x) {
-    return ((x >= 'a' && x <= 'z') ||
-            (x >= 'A' && x <= 'Z'));
-}
-
-bool isDigit(char x) {
-    return (x >= '0' && x <= '9');
-}
-
-char getName() {
-    if (!isAlphaBlue(look)) {
-        expected("name");
-    }
-
-    char name = look;
-    getChar();
-
-    return name;
-}
+#include "MemoryManager.cpp"
+#include "Essentials.cpp"
 
 std::string getNumber() {
     if (!isDigit(look)) {
@@ -199,14 +121,15 @@ void footer() {
 
 void init() {
     getChar();
+    regAvailable[DIV_REMAIN_INDEX] = false;
+    regAvailable[RETURN_VALUE] = false;
 }
 
 int main() {
     init();
     header();
 
-    int exprRegI = allocReg();
-    expression(exprRegI);
+    expression(RETURN_VALUE);
 
     footer();
 }
