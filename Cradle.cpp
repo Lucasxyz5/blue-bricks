@@ -4,41 +4,45 @@
 #include <string>
 
 const char TAB = '\t';
-const std::string ERROR = "error";
 char look;
 
-std::vector<std::string> registers = { "%eax", "%ebx", "%ecx", "%edx", "%r8d", "%r9d"};
+std::vector<std::string> registers = {
+    "%eax", "%ecx", "%edx", "%esi", "%edi",
+    "%r8d", "%r9d", "%r10d", "%r11d"
+};
+
+std::vector<std::string> registers64 = {
+    "%rax", "%rcx", "%rdx", "%rsi", "%rdi",
+    "%r8", "%r9", "%r10", "%r11"
+};
 std::vector<bool> regAvailable = std::vector<bool>(registers.size(), true);
 
-std::string allocReg() {
+int allocReg() {
     for (int i = 0; i < registers.size(); i++) {
         if (regAvailable[i] == true) {
             regAvailable[i] = false;
-            return registers[i];
+            return i;
         }
     }
-    return ERROR;
+    return -1;
 }
 
-bool freeReg(std::string reg) {
-    for (int i = 0; i < registers.size(); i++) {
-        if (registers[i] == reg) {
-            if (regAvailable[i]) {
-                return false;
-            }
-            regAvailable[i] = true;
-            return true;
-        }
+bool freeReg(int reg) {
+    if (regAvailable[reg]) {
+        return false;
     }
-    return false;
+    regAvailable[reg] = true;
+    return true;
 }
 
 void getChar() {
-    std::cin.get(look);
+    if (!std::cin.get(look)) {
+        look = '\0';
+    }
 }
 
 void error(const std::string &s) {
-    std::cout << "\n" << "Error " << s << ".\n";
+    std::cout << "\n" << "error " << s << ".\n";
 }
 
 void abortBlue(const std::string &s) {
@@ -47,7 +51,7 @@ void abortBlue(const std::string &s) {
 }
 
 void expected(const std::string &s) {
-    abortBlue(s + " Expected");
+    abortBlue(s + " expected, got " + look);
 }
 
 void match(char x) {
@@ -79,15 +83,40 @@ char getName() {
     return name;
 }
 
-char getNumber() {
+std::string getNumber() {
     if (!isDigit(look)) {
         expected("number");
     }
 
-    char num = look;
-    getChar();
+    std::string num = "";
+
+    while(isDigit(look)) {
+        num += look;
+        getChar();
+    }
+
+    if (std::stoi(num) > 2147483647) {
+        abortBlue("Integers cannot be greater than 32 bits");
+    }
 
     return num;
+}
+
+char getOperand() {
+    if (look != '+' && look != '-') {
+        expected("Operand");
+    }
+
+    char opr = look;
+    getChar();
+
+    return opr;
+}
+
+void skipWhitespace() {
+    while (look == ' ') {
+        getChar();
+    }
 }
 
 void emit(const std::string &s, bool indent = true) {
@@ -100,10 +129,62 @@ void emitLn(const std::string& s, bool indent = true) {
     std::cout << '\n';
 }
 
-void expression() {
+void operation(char operand, int regIa, int regIb) {
     std::ostringstream output;
-    output << "movl $" << getNumber() << ", %eax";
+
+    if (operand == '+') {
+        output << "addl " << registers[regIb] << ", " << registers[regIa];
+    }
+    else if (operand == '-') {
+        output << "subl " << registers[regIa] << ", " << registers[regIb];
+        emitLn(output.str());
+        output.str("");
+        output << "movl " << registers[regIb] << ", " << registers[regIa];
+    }
+
     emitLn(output.str());
+}
+
+bool expression(int regI) {
+    if (isDigit(look)) {
+        std::ostringstream output;
+        std::string reg = registers[regI];
+        output << "movl $" << getNumber() << ", " << reg;
+        emitLn(output.str());
+        return true;
+    }
+    else if (look == '(') {
+        getChar();
+        char opr = getOperand();
+        skipWhitespace();
+        if (!expression(regI)) {
+            return false;
+        }
+        emitLn("pushq " + registers64[regI]);
+
+        skipWhitespace();
+        if (!expression(regI)) {
+            return false;
+        }
+        int stackRegI = allocReg();
+        emitLn("popq " + registers64[stackRegI]);
+
+        operation(opr, regI, stackRegI);
+        freeReg(stackRegI);
+
+        skipWhitespace();
+        if (look != ')') {
+            expected(")");
+        }
+
+        getChar();
+        
+        return true;
+    }
+    else {
+        expected("expression");
+        return false;
+    }
 }
 
 void header() {
@@ -124,7 +205,8 @@ int main() {
     init();
     header();
 
-    expression();
+    int exprRegI = allocReg();
+    expression(exprRegI);
 
     footer();
 }

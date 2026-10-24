@@ -12,3 +12,5 @@ assemble with:
 clang output.s -o output
 run with: 
 ./output
+to see output:
+echo $?
