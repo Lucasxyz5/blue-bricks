@@ -4,37 +4,34 @@
 #include <string>
 
 const char TAB = '\t';
+const std::string ERROR = "error";
 char look;
 
-class RegisterManager {
-    private:
-    std::vector<std::string> registers = { "%eax", "%ebx", "%ecx", "%edx", "%r8d", "%r9d"};
-    std::vector<bool> regAvailable = std::vector<bool>(registers.size(), true);
-    public:
-    std::string allocReg() {
-        for (int i = 0; i < registers.size(); i++) {
-            if (regAvailable[i] == true) {
-                regAvailable[i] = false;
-                return registers[i];
-            }
-        }
-        return "error";
-    }
+std::vector<std::string> registers = { "%eax", "%ebx", "%ecx", "%edx", "%r8d", "%r9d"};
+std::vector<bool> regAvailable = std::vector<bool>(registers.size(), true);
 
-    bool freeReg(std::string reg) {
-        for (int i = 0; i < registers.size(); i++) {
-            if (registers[i] == reg) {
-                if (regAvailable[i]) {
-                    return false;
-                }
-                regAvailable[i] = true;
-                return true;
-            }
+std::string allocReg() {
+    for (int i = 0; i < registers.size(); i++) {
+        if (regAvailable[i] == true) {
+            regAvailable[i] = false;
+            return registers[i];
         }
-        return false;
     }
-};
+    return ERROR;
+}
 
+bool freeReg(std::string reg) {
+    for (int i = 0; i < registers.size(); i++) {
+        if (registers[i] == reg) {
+            if (regAvailable[i]) {
+                return false;
+            }
+            regAvailable[i] = true;
+            return true;
+        }
+    }
+    return false;
+}
 
 void getChar() {
     std::cin.get(look);
@@ -124,7 +121,6 @@ void init() {
 }
 
 int main() {
-    RegisterManager regManager;
     init();
     header();
 
