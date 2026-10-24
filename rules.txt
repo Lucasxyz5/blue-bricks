@@ -1,0 +1,13 @@
+EXPR:
+= NUM
+= (OPR EXPR EXPR)
+
+NUM:
+= any positive 32-bit integer
+
+OPR:
+= +
+= -
+
+any valid bluebricks program must consist of:
+EXPR
