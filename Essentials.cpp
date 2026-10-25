@@ -5,7 +5,7 @@
 
 const char TAB = '\t';
 char look;
-int lineNumber = 0;
+int lineNumber = 1;
 
 void getChar() {
     if (!std::cin.get(look)) {
