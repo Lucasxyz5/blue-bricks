@@ -25,7 +25,7 @@ std::string getNumber() {
 }
 
 char getOperand() {
-    if (look != '+' && look != '-') {
+    if (look != '+' && look != '-' && look != '*' && look != '/') {
         expected("Operand");
     }
 
@@ -35,33 +35,23 @@ char getOperand() {
     return opr;
 }
 
-void skipWhitespace() {
-    while (look == ' ') {
-        getChar();
-    }
-}
-
-void emit(const std::string &s, bool indent = true) {
-    if (indent) { std::cout << '\t'; }
-    std::cout  << s;
-}
-
-void emitLn(const std::string& s, bool indent = true) {
-    emit(s, indent);
-    std::cout << '\n';
-}
-
 void operation(char operand, int regIa, int regIb) {
     std::ostringstream output;
 
     if (operand == '+') {
-        output << "addl " << registers[regIb] << ", " << registers[regIa];
+        printLn("addl " + registers[regIb] + ", " + registers[regIa]);
     }
     else if (operand == '-') {
-        output << "subl " << registers[regIa] << ", " << registers[regIb];
-        emitLn(output.str());
-        output.str("");
-        output << "movl " << registers[regIb] << ", " << registers[regIa];
+        printLn("subl " + registers[regIa] + ", " + registers[regIb]);
+        printLn("movl " + registers[regIb] + ", " + registers[regIa]);
+    }
+    else if (operand == '*') {
+        printLn("imull " + registers[regIb] + ", " + registers[regIa]);
+    }
+    else if (operand == '/') {
+        printLn("cltd");
+        printLn("xchgl " + registers[regIb] + ", " + registers[regIa]);
+        printLn("idivl " + registers[regIb]);
     }
 
     emitLn(output.str());
@@ -107,16 +97,6 @@ bool expression(int regI) {
         expected("expression");
         return false;
     }
-}
-
-void header() {
-    emitLn(".text", false);
-    emitLn(".globl _main", false);
-    emitLn("_main:", false);
-}
-
-void footer() {
-    emitLn("ret");
 }
 
 void init() {

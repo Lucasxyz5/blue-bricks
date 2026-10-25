@@ -8,6 +8,8 @@ NUM:
 OPR:
 = +
 | -
+| *
+| /
 
 any valid bluebricks program must consist of:
 EXPR

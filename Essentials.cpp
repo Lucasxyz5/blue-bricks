@@ -53,3 +53,35 @@ char getName() {
 
     return name;
 }
+
+void skipWhitespace() {
+    while (look == ' ') {
+        getChar();
+    }
+}
+
+void emit(const std::string &s, bool indent = true) {
+    if (indent) { std::cout << '\t'; }
+    std::cout  << s;
+}
+
+void emitLn(const std::string& s, bool indent = true) {
+    emit(s, indent);
+    std::cout << '\n';
+}
+
+void printLn(std::string s, bool indent = true) {
+    std::ostringstream output;
+    output << s;
+    emitLn(output.str(), indent);
+}
+
+void header() {
+    emitLn(".text", false);
+    emitLn(".globl _main", false);
+    emitLn("_main:", false);
+}
+
+void footer() {
+    emitLn("ret");
+}
