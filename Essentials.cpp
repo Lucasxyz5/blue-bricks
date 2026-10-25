@@ -5,6 +5,7 @@
 
 const char TAB = '\t';
 char look;
+int lineNumber = 0;
 
 void getChar() {
     if (!std::cin.get(look)) {
@@ -13,7 +14,7 @@ void getChar() {
 }
 
 void error(const std::string &s) {
-    std::cout << "\n" << "error " << s << ".\n";
+    std::cerr << "\n" << "error " << s << ", at line: " << lineNumber << ".\n";
 }
 
 void abortBlue(const std::string &s) {
@@ -55,7 +56,10 @@ char getName() {
 }
 
 void skipWhitespace() {
-    while (look == ' ') {
+    while (look == ' ' || look == '\n') {
+        if (look == '\n') {
+            lineNumber += 1;
+        }
         getChar();
     }
 }
